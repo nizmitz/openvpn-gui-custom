@@ -29,11 +29,7 @@ if (-not (Test-Path "$bin\openvpn.exe")) {
     if ($p.ExitCode -notin 0, 3010) { throw "msiexec failed with exit code $($p.ExitCode)" }
 }
 
-# 2. Stop running GUI for all users
-Get-Process openvpn-gui -ErrorAction SilentlyContinue | Stop-Process -Force
-Start-Sleep -Seconds 2
-
-# 3. Fetch custom build
+# 2. Fetch custom build
 $url = if ($Version -eq "latest") {
     "https://github.com/$repo/releases/latest/download/openvpn-gui-x64.zip"
 } else {
@@ -46,13 +42,22 @@ Invoke-WebRequest $url -OutFile $zip -UseBasicParsing
 Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue
 Expand-Archive $zip -DestinationPath $tmp
 
-# 4. Replace
-Copy-Item "$tmp\openvpn-gui.exe" $bin -Force
-if (Test-Path "$tmp\libopenvpn_plap.dll") {
-    Copy-Item "$tmp\libopenvpn_plap.dll" $bin -Force
+# 3. Skip if already installed (same hash)
+$files = @("openvpn-gui.exe", "libopenvpn_plap.dll") | Where-Object { Test-Path "$tmp\$_" }
+$changed = $files | Where-Object {
+    -not (Test-Path "$bin\$_") -or
+    (Get-FileHash "$bin\$_").Hash -ne (Get-FileHash "$tmp\$_").Hash
 }
-Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue
+if (-not $changed) {
+    Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Host "Custom OpenVPN GUI ($Version) already installed. Nothing to do."
+    exit 0
+}
 
-# 5. Relaunch
+# 4. Stop running GUI for all users, replace, relaunch
+Get-Process openvpn-gui -ErrorAction SilentlyContinue | Stop-Process -Force
+Start-Sleep -Seconds 2
+foreach ($f in $changed) { Copy-Item "$tmp\$f" $bin -Force }
+Remove-Item $zip, $tmp -Recurse -Force -ErrorAction SilentlyContinue
 Start-Process "$bin\openvpn-gui.exe"
 Write-Host "Done. Custom OpenVPN GUI ($Version) installed to $bin"
