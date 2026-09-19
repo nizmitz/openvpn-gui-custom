@@ -139,21 +139,36 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   ProductCode: String;
   ResultCode: Integer;
+  RemoveOpenVpn, WipeData: Boolean;
 begin
   if CurUninstallStep <> usUninstall then
     exit;
 
   ProductCode := FindOpenVpnProductCode();
-  if ProductCode = '' then
-    exit;
 
-  if not UninstallSilent() then
-    if MsgBox('Also uninstall OpenVPN itself and wipe all configs, logs and saved passwords for every user?', mbConfirmation, MB_YESNO) <> IDYES then
-      exit;
+  if UninstallSilent() then
+  begin
+    RemoveOpenVpn := True;
+    WipeData := True;
+  end
+  else
+  begin
+    RemoveOpenVpn := (ProductCode <> '') and
+      (MsgBox('Also uninstall OpenVPN itself (openvpn.exe, drivers, GUI)?', mbConfirmation, MB_YESNO) = IDYES);
+    WipeData :=
+      MsgBox('Also delete all OpenVPN configs, logs and saved passwords for every user on this computer?', mbConfirmation, MB_YESNO) = IDYES;
+  end;
 
-  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM openvpn-gui.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  Exec(ExpandConstant('{sys}\msiexec.exe'), '/x ' + ProductCode + ' /qn /norestart', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  if (ResultCode <> 0) and (ResultCode <> 3010) then
-    MsgBox('OpenVPN uninstall failed (msiexec exit code ' + IntToStr(ResultCode) + ').', mbError, MB_OK);
-  WipeOpenVpnData();
+  if RemoveOpenVpn or WipeData then
+    Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM openvpn-gui.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+
+  if RemoveOpenVpn and (ProductCode <> '') then
+  begin
+    Exec(ExpandConstant('{sys}\msiexec.exe'), '/x ' + ProductCode + ' /qn /norestart', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    if (ResultCode <> 0) and (ResultCode <> 3010) then
+      MsgBox('OpenVPN uninstall failed (msiexec exit code ' + IntToStr(ResultCode) + ').', mbError, MB_OK);
+  end;
+
+  if WipeData then
+    WipeOpenVpnData();
 end;
