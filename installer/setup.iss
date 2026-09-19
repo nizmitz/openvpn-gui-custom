@@ -13,9 +13,13 @@
 
 [Setup]
 AppId={{7B9C2E1A-3F44-4D6E-9A21-0C5E8F1D2B77}
-AppName=OpenVPN GUI (custom)
+AppName=OpenVPN Add-On for Password Protection
 AppVersion={#AppVersion}
+UninstallDisplayName=OpenVPN Add-On for Password Protection
+UninstallDisplayIcon={app}\bin\openvpn-gui.exe
 AppPublisher=nizmitz
+VersionInfoProductName=OpenVPN Add-On for Password Protection
+VersionInfoDescription=OpenVPN GUI without password reveal
 AppPublisherURL=https://github.com/nizmitz/openvpn-gui-custom
 DefaultDirName={commonpf64}\OpenVPN
 DisableDirPage=yes
@@ -27,7 +31,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin
 CloseApplications=yes
 RestartApplications=no
-OutputBaseFilename=openvpn-gui-custom-{#AppVersion}-setup
+OutputBaseFilename=OpenVPN-PasswordProtection-AddOn-{#AppVersion}-setup
 OutputDir=.
 Compression=lzma2
 SolidCompression=yes
