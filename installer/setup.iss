@@ -78,3 +78,50 @@ begin
   if ResultCode = 3010 then
     NeedsRestart := True;
 end;
+
+{ Find the MSI product code of the official OpenVPN package }
+function FindOpenVpnProductCode(): String;
+var
+  Root: String;
+  Names: TArrayOfString;
+  I: Integer;
+  DisplayName, UninstallString: String;
+begin
+  Result := '';
+  Root := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall';
+  if not RegGetSubkeyNames(HKLM64, Root, Names) then
+    exit;
+  for I := 0 to GetArrayLength(Names) - 1 do
+  begin
+    if RegQueryStringValue(HKLM64, Root + '\' + Names[I], 'DisplayName', DisplayName)
+       and (Pos('OpenVPN ', DisplayName) = 1)
+       and RegQueryStringValue(HKLM64, Root + '\' + Names[I], 'UninstallString', UninstallString)
+       and (Pos('MsiExec', UninstallString) > 0) then
+    begin
+      Result := Names[I];
+      exit;
+    end;
+  end;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+var
+  ProductCode: String;
+  ResultCode: Integer;
+begin
+  if CurUninstallStep <> usUninstall then
+    exit;
+
+  ProductCode := FindOpenVpnProductCode();
+  if ProductCode = '' then
+    exit;
+
+  if not UninstallSilent() then
+    if MsgBox('Also uninstall OpenVPN itself (openvpn.exe, drivers, GUI)?', mbConfirmation, MB_YESNO) <> IDYES then
+      exit;
+
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM openvpn-gui.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec(ExpandConstant('{sys}\msiexec.exe'), '/x ' + ProductCode + ' /qn /norestart', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  if (ResultCode <> 0) and (ResultCode <> 3010) then
+    MsgBox('OpenVPN uninstall failed (msiexec exit code ' + IntToStr(ResultCode) + ').', mbError, MB_OK);
+end;
