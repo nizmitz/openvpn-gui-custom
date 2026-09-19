@@ -104,6 +104,37 @@ begin
   end;
 end;
 
+{ Remove leftovers the MSI does not touch: configs, logs, saved GUI settings and
+  passwords -- for every user profile on the machine }
+procedure WipeOpenVpnData();
+var
+  UsersDir: String;
+  FindRec: TFindRec;
+  Names: TArrayOfString;
+  I: Integer;
+begin
+  DelTree(ExpandConstant('{commonpf64}\OpenVPN'), True, True, True);
+  RegDeleteKeyIncludingSubkeys(HKLM64, 'SOFTWARE\OpenVPN');
+
+  UsersDir := ExpandConstant('{sd}\Users');
+  if FindFirst(UsersDir + '\*', FindRec) then
+  begin
+    try
+      repeat
+        if (FindRec.Attributes and FILE_ATTRIBUTE_DIRECTORY <> 0)
+           and (FindRec.Name <> '.') and (FindRec.Name <> '..') then
+          DelTree(UsersDir + '\' + FindRec.Name + '\OpenVPN', True, True, True);
+      until not FindNext(FindRec);
+    finally
+      FindClose(FindRec);
+    end;
+  end;
+
+  if RegGetSubkeyNames(HKEY_USERS, '', Names) then
+    for I := 0 to GetArrayLength(Names) - 1 do
+      RegDeleteKeyIncludingSubkeys(HKEY_USERS, Names[I] + '\Software\OpenVPN-GUI');
+end;
+
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   ProductCode: String;
@@ -117,11 +148,12 @@ begin
     exit;
 
   if not UninstallSilent() then
-    if MsgBox('Also uninstall OpenVPN itself (openvpn.exe, drivers, GUI)?', mbConfirmation, MB_YESNO) <> IDYES then
+    if MsgBox('Also uninstall OpenVPN itself and wipe all configs, logs and saved passwords for every user?', mbConfirmation, MB_YESNO) <> IDYES then
       exit;
 
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM openvpn-gui.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Exec(ExpandConstant('{sys}\msiexec.exe'), '/x ' + ProductCode + ' /qn /norestart', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   if (ResultCode <> 0) and (ResultCode <> 3010) then
     MsgBox('OpenVPN uninstall failed (msiexec exit code ' + IntToStr(ResultCode) + ').', mbError, MB_OK);
+  WipeOpenVpnData();
 end;
