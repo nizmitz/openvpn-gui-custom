@@ -178,9 +178,6 @@ bool OVPNMsgWait(DWORD timeout, HWND hdlg);
 
 bool GetRandomPassword(char *buf, size_t len);
 
-void ResetPasswordReveal(HWND edit, HWND btn, WPARAM wParam);
-
-void ChangePasswordVisibility(HWND edit, HWND btn, WPARAM wParam);
 
 /**
  * Compare two paths by checking whether they point to the
