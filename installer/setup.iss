@@ -1,0 +1,76 @@
+; Inno Setup script: bundles the official OpenVPN MSI and overlays the custom GUI.
+; Build: ISCC.exe /DAppVersion=<ver> /DOpenVpnMsi=<path> /DBinDir=<dir> setup.iss
+
+#ifndef AppVersion
+  #define AppVersion "0.0.0"
+#endif
+#ifndef OpenVpnMsi
+  #define OpenVpnMsi "openvpn.msi"
+#endif
+#ifndef BinDir
+  #define BinDir "."
+#endif
+
+[Setup]
+AppId={{7B9C2E1A-3F44-4D6E-9A21-0C5E8F1D2B77}
+AppName=OpenVPN GUI (custom)
+AppVersion={#AppVersion}
+AppPublisher=nizmitz
+AppPublisherURL=https://github.com/nizmitz/openvpn-gui-custom
+DefaultDirName={commonpf64}\OpenVPN
+DisableDirPage=yes
+DisableProgramGroupPage=yes
+CreateUninstallRegKey=yes
+Uninstallable=yes
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
+PrivilegesRequired=admin
+CloseApplications=yes
+RestartApplications=no
+OutputBaseFilename=openvpn-gui-custom-{#AppVersion}-setup
+OutputDir=.
+Compression=lzma2
+SolidCompression=yes
+WizardStyle=modern
+
+[Files]
+; Official OpenVPN installer, only run when OpenVPN is not already present
+Source: "{#OpenVpnMsi}"; DestName: "openvpn.msi"; Flags: dontcopy
+; Custom GUI overlay -- never removed on uninstall, OpenVPN owns these paths
+Source: "{#BinDir}\openvpn-gui.exe"; DestDir: "{app}\bin"; Flags: ignoreversion uninsneveruninstall
+Source: "{#BinDir}\libopenvpn_plap.dll"; DestDir: "{app}\bin"; Flags: ignoreversion uninsneveruninstall skipifsourcedoesntexist
+
+[Run]
+Filename: "{app}\bin\openvpn-gui.exe"; Description: "Launch OpenVPN GUI"; Flags: nowait postinstall skipifsilent
+
+[Code]
+function OpenVpnInstalled(): Boolean;
+begin
+  Result := FileExists(ExpandConstant('{commonpf64}\OpenVPN\bin\openvpn.exe'));
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  ResultCode: Integer;
+  Msi: String;
+begin
+  Result := '';
+
+  { Stop any running GUI so the exe can be replaced }
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM openvpn-gui.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+
+  if OpenVpnInstalled() then
+    exit;
+
+  ExtractTemporaryFile('openvpn.msi');
+  Msi := ExpandConstant('{tmp}\openvpn.msi');
+  if not Exec(ExpandConstant('{sys}\msiexec.exe'), '/i "' + Msi + '" /qn /norestart', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) then
+  begin
+    Result := 'Could not start msiexec.';
+    exit;
+  end;
+  if (ResultCode <> 0) and (ResultCode <> 3010) then
+    Result := 'Official OpenVPN install failed (msiexec exit code ' + IntToStr(ResultCode) + ').';
+  if ResultCode = 3010 then
+    NeedsRestart := True;
+end;

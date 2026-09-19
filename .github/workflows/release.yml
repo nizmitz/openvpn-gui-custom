@@ -48,9 +48,46 @@ jobs:
           name: openvpn-gui-${{ matrix.arch }}
           path: openvpn-gui-${{ matrix.arch }}.zip
 
+  installer:
+    name: 'inno setup - x64'
+    needs: build
+    runs-on: windows-2022
+    env:
+      OPENVPN_MSI_URL: https://swupdate.openvpn.org/community/releases/OpenVPN-2.6.14-I001-amd64.msi
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: openvpn-gui-x64
+          path: dist
+
+      - name: Prepare inputs
+        shell: pwsh
+        run: |
+          Expand-Archive dist/openvpn-gui-x64.zip -DestinationPath dist/bin
+          Invoke-WebRequest $env:OPENVPN_MSI_URL -OutFile dist/openvpn.msi -UseBasicParsing
+          $ver = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME -replace '^v','' } else { "0.0.0-$($env:GITHUB_SHA.Substring(0,7))" }
+          "APP_VERSION=$ver" | Out-File $env:GITHUB_ENV -Append
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
+            "/DAppVersion=$env:APP_VERSION" `
+            "/DOpenVpnMsi=$PWD\dist\openvpn.msi" `
+            "/DBinDir=$PWD\dist\bin" `
+            "/O$PWD\dist" `
+            installer\setup.iss
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: openvpn-gui-custom-setup
+          path: dist/openvpn-gui-custom-*-setup.exe
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
+    needs: [build, installer]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -64,5 +101,6 @@ jobs:
         with:
           files: |
             artifacts/*.zip
+            artifacts/*-setup.exe
             scripts/install.ps1
           generate_release_notes: true
