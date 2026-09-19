@@ -43,6 +43,8 @@ Source: "{#OpenVpnMsi}"; DestName: "openvpn.msi"; Flags: dontcopy
 ; Custom GUI overlay -- never removed on uninstall, OpenVPN owns these paths
 Source: "{#BinDir}\openvpn-gui.exe"; DestDir: "{app}\bin"; Flags: ignoreversion uninsneveruninstall
 Source: "{#BinDir}\libopenvpn_plap.dll"; DestDir: "{app}\bin"; Flags: ignoreversion uninsneveruninstall skipifsourcedoesntexist
+; Keep a copy of this installer so Programs and Features can offer "Change" (repair)
+Source: "{srcexe}"; DestDir: "{app}\addon"; DestName: "setup.exe"; Flags: external ignoreversion; Check: not IsRepair
 
 [Run]
 Filename: "{app}\bin\openvpn-gui.exe"; Description: "Launch OpenVPN GUI"; Flags: nowait postinstall skipifsilent
@@ -53,10 +55,22 @@ begin
   Result := FileExists(ExpandConstant('{commonpf64}\OpenVPN\bin\openvpn.exe'));
 end;
 
+function IsRepair(): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 1 to ParamCount do
+    if CompareText(ParamStr(I), '/REPAIR') = 0 then
+      Result := True;
+end;
+
+function FindOpenVpnProductCode(): String; forward;
+
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   ResultCode: Integer;
-  Msi: String;
+  Msi, ProductCode: String;
 begin
   Result := '';
 
@@ -64,7 +78,22 @@ begin
   Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM openvpn-gui.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 
   if OpenVpnInstalled() then
+  begin
+    { Repair: let the official MSI restore its files, then the GUI overlay is re-applied }
+    if IsRepair() then
+    begin
+      ProductCode := FindOpenVpnProductCode();
+      if ProductCode <> '' then
+      begin
+        Exec(ExpandConstant('{sys}\msiexec.exe'), '/fa ' + ProductCode + ' /qn /norestart', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+        if (ResultCode <> 0) and (ResultCode <> 3010) then
+          Result := 'OpenVPN repair failed (msiexec exit code ' + IntToStr(ResultCode) + ').';
+        if ResultCode = 3010 then
+          NeedsRestart := True;
+      end;
+    end;
     exit;
+  end;
 
   ExtractTemporaryFile('openvpn.msi');
   Msi := ExpandConstant('{tmp}\openvpn.msi');
@@ -133,6 +162,17 @@ begin
   if RegGetSubkeyNames(HKEY_USERS, '', Names) then
     for I := 0 to GetArrayLength(Names) - 1 do
       RegDeleteKeyIncludingSubkeys(HKEY_USERS, Names[I] + '\Software\OpenVPN-GUI');
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  Key: String;
+begin
+  if CurStep <> ssPostInstall then
+    exit;
+  Key := 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ExpandConstant('{#SetupSetting("AppId")}') + '_is1';
+  RegWriteStringValue(HKLM64, Key, 'ModifyPath', '"' + ExpandConstant('{app}\addon\setup.exe') + '" /REPAIR');
+  RegWriteDWordValue(HKLM64, Key, 'NoModify', 0);
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
