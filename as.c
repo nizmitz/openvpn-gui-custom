@@ -302,8 +302,6 @@ CRDialogFunc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 
             /* disable OK button by default - not disabled in resources */
             EnableWindow(GetDlgItem(hwndDlg, IDOK), FALSE);
-            ResetPasswordReveal(
-                GetDlgItem(hwndDlg, ID_EDT_RESPONSE), GetDlgItem(hwndDlg, ID_PASSWORD_REVEAL), 0);
             break;
 
         case WM_COMMAND:
@@ -312,12 +310,6 @@ CRDialogFunc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
             switch (LOWORD(wParam))
             {
                 case ID_EDT_RESPONSE:
-                    if (!(param->flags & FLAG_CR_ECHO))
-                    {
-                        ResetPasswordReveal(GetDlgItem(hwndDlg, ID_EDT_RESPONSE),
-                                            GetDlgItem(hwndDlg, ID_PASSWORD_REVEAL),
-                                            wParam);
-                    }
                     if (HIWORD(wParam) == EN_UPDATE)
                     {
                         /* enable OK if response is non-empty */
@@ -336,12 +328,6 @@ CRDialogFunc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 
                 case IDCANCEL:
                     EndDialog(hwndDlg, LOWORD(wParam));
-                    return TRUE;
-
-                case ID_PASSWORD_REVEAL: /* password reveal symbol clicked */
-                    ChangePasswordVisibility(GetDlgItem(hwndDlg, ID_EDT_RESPONSE),
-                                             GetDlgItem(hwndDlg, ID_PASSWORD_REVEAL),
-                                             wParam);
                     return TRUE;
             }
             break;
@@ -760,8 +746,6 @@ ImportProfileFromURLDialogFunc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lPa
             }
             /* disable OK button until required data is filled in */
             EnableWindow(GetDlgItem(hwndDlg, IDOK), FALSE);
-            ResetPasswordReveal(
-                GetDlgItem(hwndDlg, ID_EDT_AUTH_PASS), GetDlgItem(hwndDlg, ID_PASSWORD_REVEAL), 0);
             break;
 
         case WM_COMMAND:
@@ -769,11 +753,6 @@ ImportProfileFromURLDialogFunc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lPa
             switch (LOWORD(wParam))
             {
                 case ID_EDT_AUTH_PASS:
-                    ResetPasswordReveal(GetDlgItem(hwndDlg, ID_EDT_AUTH_PASS),
-                                        GetDlgItem(hwndDlg, ID_PASSWORD_REVEAL),
-                                        wParam);
-
-                /* fall through */
                 case ID_EDT_AUTH_USER:
                 case ID_EDT_URL:
                     if (HIWORD(wParam) == EN_UPDATE)
@@ -838,12 +817,6 @@ ImportProfileFromURLDialogFunc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lPa
 
                 case IDCANCEL:
                     EndDialog(hwndDlg, LOWORD(wParam));
-                    return TRUE;
-
-                case ID_PASSWORD_REVEAL: /* password reveal symbol clicked */
-                    ChangePasswordVisibility(GetDlgItem(hwndDlg, ID_EDT_AUTH_PASS),
-                                             GetDlgItem(hwndDlg, ID_PASSWORD_REVEAL),
-                                             wParam);
                     return TRUE;
             }
             break;

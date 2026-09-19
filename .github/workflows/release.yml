@@ -1,0 +1,65 @@
+name: Release build
+
+on:
+  push:
+    branches: [master, remove-password-reveal]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, x86]
+
+    name: 'msvc - ${{ matrix.arch }} release'
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: lukka/get-cmake@fffaaafeea488556c2c12dad60690008bc1caacb # v4.4.2
+
+      - name: Restore artifacts, or setup vcpkg (do not install any package)
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2 # v11.6
+        with:
+          vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
+          vcpkgGitCommitId: 7ff71c68261ecf3b60cdb8772f2e6759ee0a71b1
+
+      - name: Run CMake consuming CMakePreset.json and vcpkg.json by mean of vcpkg.
+        uses: lukka/run-cmake@5d55ea7949e25f69f0ecb516d8d572297e03a956 # v10.9
+        with:
+          configurePreset: '${{ matrix.arch }}'
+          buildPreset: '${{ matrix.arch }}-release'
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $out = "out/build/${{ matrix.arch }}/release"
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item "$out/openvpn-gui.exe" dist/
+          Copy-Item "$out/libopenvpn_plap.dll" dist/ -ErrorAction SilentlyContinue
+          Compress-Archive -Path dist/* -DestinationPath "openvpn-gui-${{ matrix.arch }}.zip" -Force
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: openvpn-gui-${{ matrix.arch }}
+          path: openvpn-gui-${{ matrix.arch }}.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.zip
+          generate_release_notes: true
