@@ -40,3 +40,6 @@ x64
 Debug
 out
 build
+# AI assistant notes (local only)
+CLAUDE.md
+AGENTS.md
