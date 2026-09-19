@@ -340,8 +340,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "配置文件编辑器启动失败: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "没有找到可读取的连接配置文件。\n\
-请使用「导入配置文件…」菜单，或将配置文件复制到「%ls」或「%ls」。"
     IDS_ERR_CONFIG_NOT_AUTHORIZED "启动此连接 (%ls) 必须要有「%ls」群组的成员资格。\
 请联系您的系统管理员。\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "启动此连接 (%ls) 必须要有「%ls」群组的成员资格。\

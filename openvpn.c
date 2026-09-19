@@ -2337,13 +2337,13 @@ RenderStatusWindow(HWND hwndDlg, UINT w, UINT h)
     MoveWindow(GetDlgItem(hwndDlg, ID_TXT_BYTECOUNT),
                DPI_SCALE(20),
                h - DPI_SCALE(55),
-               w - DPI_SCALE(210),
+               w - DPI_SCALE(330),
                DPI_SCALE(15),
                TRUE);
     MoveWindow(GetDlgItem(hwndDlg, ID_TXT_VERSION),
-               w - DPI_SCALE(180),
+               w - DPI_SCALE(300),
                h - DPI_SCALE(55),
-               DPI_SCALE(170),
+               DPI_SCALE(290),
                DPI_SCALE(15),
                TRUE);
     MoveWindow(GetDlgItem(hwndDlg, ID_DISCONNECT),
@@ -2444,13 +2444,14 @@ StatusDialogFunc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam)
                     MB_OK | MB_ICONERROR, c->hwndStatus, TEXT(PACKAGE_NAME), IDS_ERR_SET_SIZE);
             }
 
-            /* display version string as "OpenVPN GUI gui_version/core_version" */
+            /* display version string as "OpenVPN GUI gui_version/core_version - brand" */
             wchar_t version[256];
             _sntprintf_0(version,
-                         L"%hs %hs/%hs",
+                         L"%hs %hs/%hs - %hs",
                          PACKAGE_NAME,
                          PACKAGE_VERSION_RESOURCE_STR,
-                         o.ovpn_version_str);
+                         o.ovpn_version_str,
+                         BRAND_FOOTER);
             SetDlgItemText(hwndDlg, ID_TXT_VERSION, version);
 
             /* Set size and position of controls */

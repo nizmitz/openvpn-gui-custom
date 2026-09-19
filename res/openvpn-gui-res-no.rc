@@ -337,7 +337,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "Feil under oppstart av konfigurasjons-editor: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "Ingen lesbare tilkoblingsprofiler (konfigurasjonsfiler) funnet"
     IDS_ERR_CONFIG_NOT_AUTHORIZED "For å starte tilkoblingen (%ls) kreves medlemskap i gruppen ""%ls"". \
 Kontakt din systemadministrator for hjelp med dette.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "For å starte tilkoblingen (%ls) kreves medlemskap i gruppen ""%ls"".\n\n\

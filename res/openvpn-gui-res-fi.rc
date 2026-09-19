@@ -337,8 +337,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "Asetusten muokkaimen käynnistäminen epäonnistui: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "Ei käyttökelpoisia asetustiedostoja.\n\
-Valitse ""Tuo tiedosto.."" valikosta tai kopioi asetustiedosto kansioon ""%ls"" tai ""%ls""."
     IDS_ERR_CONFIG_NOT_AUTHORIZED "Yhteyden %ls käynnistäminen vaatii ryhmään \
 ""%ls"" kuulumisen. Ota yhteys järjestelmäylläpitäjään.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "Yhteyden %ls käynnistäminen vaatii ryhmään \

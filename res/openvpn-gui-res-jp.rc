@@ -338,8 +338,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "設定エディタの起動に失敗しました: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "読み込める接続プロファイル（設定ファイル）がありません。\n\
-""ファイルのインポート.."" メニューを使用するか、設定ファイルを ""%ls"" か ""%ls"" にコピーしてください。"
     IDS_ERR_CONFIG_NOT_AUTHORIZED "この接続 (%ls) を開始するには \
 ""%ls"" グループのメンバーである必要があります。システム管理者に連絡してください。\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "この接続 (%ls) を開始するには \
