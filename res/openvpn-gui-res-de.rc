@@ -339,8 +339,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "Fehler beim Starten des Konfigurations-Editors: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "Keine lesbaren Konfigurations-Profile (Konfigurationsdateien) gefunden.\n\
-Benutzen Sie das ""Datei importieren…"" Menü oder kopieren Sie Ihre Konfigurationsdateien nach ""%ls"" oder ""%ls""."
     IDS_ERR_CONFIG_NOT_AUTHORIZED "Zum Starten dieser Verbindung (%ls) müssen Sie Mitglied in der\
 Gruppe ""%ls"" sein. Kontaktieren Sie Ihren Systemadministrator.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "Zum Starten dieser Verbindung (%ls) müssen Sie Mitglied in der\

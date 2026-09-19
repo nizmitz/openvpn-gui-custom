@@ -338,8 +338,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "Errore nell'apertura dell'editor di configurazione: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "Nessun file di configurazione trovato.\n\
-Usa il menu ""Importa file…"" o copia i file in ""%ls"" oppure ""%ls""."
     IDS_ERR_CONFIG_NOT_AUTHORIZED "L'avvio di questa connessione (%ls) richiede di essere membro del \
 gruppo ""%ls"". Contatta l'amministratore di sistema.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "L'avvio di questa connessione (%ls) richiede di essere membro del \

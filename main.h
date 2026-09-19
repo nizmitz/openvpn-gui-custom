@@ -22,6 +22,9 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+/* Shown after the version string in the status window footer */
+#define BRAND_FOOTER "31West Global Services"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>

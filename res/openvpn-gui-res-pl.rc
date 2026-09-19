@@ -338,8 +338,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "Błąd podczas uruchamiania edytora konfiguracji: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "Brak profili połączeń (plików konfiguracyjnych) możliwych do użycia.\n\
-Użyj opcji ""Importuj plik…"" z menu lub skopiuj plik konfiguracyjny do ""%ls"" lub ""%ls""."
     IDS_ERR_CONFIG_NOT_AUTHORIZED "Uruchomienie tego połączenia (%ls) wymaga przynależności do \
 grupy ""%ls"". Skontaktuj się z administratorem.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "Uruchomienie tego połączenia (%ls) wymaga przynależności do \

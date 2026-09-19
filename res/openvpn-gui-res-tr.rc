@@ -338,8 +338,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "Ayar editörü başlarken hata oluştu: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "Okunabilir bağlantı profilleri (yapılandırma dosyaları) bulunamadı.\n\
-""Dosyadan İçe Aktar..."" menüsünü kullanın veya yapılandırma dosyalarınızı ""%ls"" veya ""%ls"" konumuna kopyalayın."
     IDS_ERR_CONFIG_NOT_AUTHORIZED "Bu bağlantıyı başlatmak (%ls) \
 ""%ls"" grubuna üyelik gerektiriyor. Sistem yöneticinizle iletişime geçin.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "Starting this connection (%ls) requires membership in \

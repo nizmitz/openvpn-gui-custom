@@ -50,6 +50,19 @@ Source: "{srcexe}"; DestDir: "{app}\addon"; DestName: "setup.exe"; Flags: extern
 Filename: "{app}\bin\openvpn-gui.exe"; Description: "Launch OpenVPN GUI"; Flags: nowait postinstall skipifsilent
 
 [Code]
+{ Company name in the wizard footer, next to the navigation buttons }
+procedure InitializeWizard();
+var
+  Footer: TNewStaticText;
+begin
+  Footer := TNewStaticText.Create(WizardForm);
+  Footer.Parent := WizardForm;
+  Footer.Caption := '31West Global Services';
+  Footer.Left := ScaleX(16);
+  Footer.Top := WizardForm.CancelButton.Top + (WizardForm.CancelButton.Height - Footer.Height) div 2;
+  Footer.Anchors := [akLeft, akBottom];
+end;
+
 function OpenVpnInstalled(): Boolean;
 begin
   Result := FileExists(ExpandConstant('{commonpf64}\OpenVPN\bin\openvpn.exe'));

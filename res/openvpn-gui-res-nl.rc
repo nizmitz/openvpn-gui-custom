@@ -338,8 +338,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "Fout tijdens starten configurator: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "Geen leesbare verbindingsprofielen (config files) gevonden.\n\
-Gebruik het menu ""Bestand importeren…"" of kopieer uw configuratiebestanden naar ""%ls"" of ""%ls""."
     IDS_ERR_CONFIG_NOT_AUTHORIZED "Het maken van deze verbinding (%ls) vereist lidmaatschap van\n\
 de groep ""%ls"". Neem contact op met de systeembeheerder.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "Het maken van deze verbinding (%ls) vereist lidmaatschap van\n\

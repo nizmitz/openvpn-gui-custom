@@ -338,8 +338,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "Došlo k chybě při spouštění nástroje pro úpravu konfigurace: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "Nebyly nalezeny žádné soubory konfigurací spojení.\n\
-Použijte volbu menu ""Import souboru konfigurace…"" nebo zkopírujte konfigurační soubory do ""%ls"" nebo ""%ls""."
     IDS_ERR_CONFIG_NOT_AUTHORIZED "Vytvoření tohoto spojení (%ls) vyžaduje členství ve skupině \
 ""%ls"". Kontaktujte svého správce systému.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "Vytvoření tohoto spojení (%ls) vyžaduje členství ve skupině \

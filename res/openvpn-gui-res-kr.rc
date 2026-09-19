@@ -338,8 +338,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "설정 편집기 시작 실패: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "설정 파일이 없습니다.\n\
-""파일 불러오기.."" 메뉴를 이용하거나 설정 파일을 ""%ls"" 또는 ""%ls""로 복사 하십시오."
     IDS_ERR_CONFIG_NOT_AUTHORIZED "이 연결(%ls)을 시작하기 위하여 ""%ls"" 그룹 권한이 필요합니다.\
 시스템 관리자에게 문의 하십시오.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "이 연결(%ls)을 시작하기 위하여 ""%ls"" 그룹 권한이 필요합니다.\n\n\

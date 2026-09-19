@@ -426,11 +426,6 @@ BuildFileList()
         }
     }
 
-    if (o.num_configs == 0 && issue_warnings)
-    {
-        ShowLocalizedMsg(IDS_NFO_NO_CONFIGS, o.config_dir, o.global_config_dir);
-    }
-
     ActivateConfigGroups();
 
     issue_warnings = false;

@@ -337,8 +337,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "Erreur au démarrage de l'éditeur de la configuration: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "Aucun profil de connexion lisible trouvé (fichiers de configuration).\n\
-Utilisez le menu ""Importer fichier.."" ou copiez vos fichiers de configuration vers ""%ls"" ou ""%ls""."
     IDS_ERR_CONFIG_NOT_AUTHORIZED "À partir de cette connexion (%ls) une adhésion est nécessaire au groupe \
 ""%ls"". Contactez votre administrateur système.\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "À partir de cette connexion (%ls) une adhésion est nécessaire au groupe \

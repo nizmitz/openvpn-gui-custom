@@ -340,8 +340,6 @@ BEGIN
     IDS_ERR_START_CONF_EDITOR "設定檔編輯器啟動失敗: %ls"
 
     /* OpenVPN */
-    IDS_NFO_NO_CONFIGS "沒有找到可讀取的連線設定檔。\n\
-請使用選單的「匯入設定檔…」，或將設定檔複製到「%ls」或「%ls」。"
     IDS_ERR_CONFIG_NOT_AUTHORIZED "啟動此連線 (%ls) 必須要有「%ls」群組的成員資格。\
 請連絡您的系統管理員。\n"
     IDS_ERR_CONFIG_TRY_AUTHORIZE  "啟動此連線 (%ls) 必須要有「%ls」群組的成員資格。\
