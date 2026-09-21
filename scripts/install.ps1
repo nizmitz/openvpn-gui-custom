@@ -12,7 +12,7 @@
 #>
 param(
     [string]$Version = "latest",
-    [string]$OpenVpnMsi = "https://swupdate.openvpn.org/community/releases/OpenVPN-2.6.14-I001-amd64.msi"
+    [string]$OpenVpnMsi = "https://swupdate.openvpn.org/community/releases/OpenVPN-2.7.7-I001-amd64.msi"
 )
 
 $ErrorActionPreference = "Stop"
