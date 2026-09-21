@@ -69,12 +69,15 @@ jobs:
           Invoke-WebRequest $env:OPENVPN_MSI_URL -OutFile dist/openvpn.msi -UseBasicParsing
           $ver = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME -replace '^v','' } else { "0.0.0-$($env:GITHUB_SHA.Substring(0,7))" }
           "APP_VERSION=$ver" | Out-File $env:GITHUB_ENV -Append
+          $ovpn = [regex]::Match($env:OPENVPN_MSI_URL, 'OpenVPN-(\d+\.\d+\.\d+)-').Groups[1].Value
+          "OPENVPN_VERSION=$ovpn" | Out-File $env:GITHUB_ENV -Append
 
       - name: Build installer
         shell: pwsh
         run: |
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
             "/DAppVersion=$env:APP_VERSION" `
+            "/DOpenVpnVersion=$env:OPENVPN_VERSION" `
             "/DOpenVpnMsi=$PWD\dist\openvpn.msi" `
             "/DBinDir=$PWD\dist\bin" `
             "/O$PWD\dist" `

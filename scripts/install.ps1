@@ -19,8 +19,12 @@ $ErrorActionPreference = "Stop"
 $repo = "nizmitz/openvpn-gui-custom"
 $bin  = "C:\Program Files\OpenVPN\bin"
 
-# 1. Official OpenVPN (skip if already present)
-if (-not (Test-Path "$bin\openvpn.exe")) {
+# 1. Official OpenVPN: install if missing, upgrade in place if older than the pinned MSI
+$wanted = [version]([regex]::Match($OpenVpnMsi, 'OpenVPN-(\d+\.\d+\.\d+)-').Groups[1].Value)
+$installed = Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall' |
+    Get-ItemProperty | Where-Object { $_.DisplayName -like 'OpenVPN *' -and $_.UninstallString -like '*MsiExec*' } |
+    Select-Object -First 1 -ExpandProperty DisplayVersion
+if (-not (Test-Path "$bin\openvpn.exe") -or -not $installed -or [version]$installed -lt $wanted) {
     $msi = Join-Path $env:TEMP "openvpn.msi"
     Write-Host "Downloading official OpenVPN..."
     Invoke-WebRequest $OpenVpnMsi -OutFile $msi -UseBasicParsing

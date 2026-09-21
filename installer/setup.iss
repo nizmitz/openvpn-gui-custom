@@ -10,6 +10,9 @@
 #ifndef BinDir
   #define BinDir "."
 #endif
+#ifndef OpenVpnVersion
+  #define OpenVpnVersion "0.0.0"
+#endif
 
 [Setup]
 AppId={{7B9C2E1A-3F44-4D6E-9A21-0C5E8F1D2B77}
@@ -80,6 +83,34 @@ end;
 
 function FindOpenVpnProductCode(): String; forward;
 
+{ DisplayVersion of the installed official OpenVPN package, '' if none }
+function InstalledOpenVpnVersion(): String;
+var
+  ProductCode: String;
+begin
+  Result := '';
+  ProductCode := FindOpenVpnProductCode();
+  if ProductCode <> '' then
+    RegQueryStringValue(HKLM64, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\' + ProductCode, 'DisplayVersion', Result);
+end;
+
+{ Compare dotted versions numerically: <0 if A<B, 0 if equal, >0 if A>B }
+function CompareVersion(A, B: String): Integer;
+var
+  PA, PB: Integer;
+  SA, SB: String;
+begin
+  Result := 0;
+  while (Result = 0) and ((A <> '') or (B <> '')) do
+  begin
+    PA := Pos('.', A); if PA = 0 then PA := Length(A) + 1;
+    PB := Pos('.', B); if PB = 0 then PB := Length(B) + 1;
+    SA := Copy(A, 1, PA - 1); SB := Copy(B, 1, PB - 1);
+    Result := StrToIntDef(SA, 0) - StrToIntDef(SB, 0);
+    A := Copy(A, PA + 1, Length(A)); B := Copy(B, PB + 1, Length(B));
+  end;
+end;
+
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   ResultCode: Integer;
@@ -104,8 +135,12 @@ begin
         if ResultCode = 3010 then
           NeedsRestart := True;
       end;
+      exit;
     end;
-    exit;
+    { Installed version is current or newer: keep it }
+    if CompareVersion(InstalledOpenVpnVersion(), '{#OpenVpnVersion}') >= 0 then
+      exit;
+    { Older: fall through and let the bundled MSI upgrade it in place }
   end;
 
   ExtractTemporaryFile('openvpn.msi');
