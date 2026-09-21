@@ -18,6 +18,15 @@
             "extends": [
                 "schedule:monthly"
             ]
+        },
+        {
+            "matchDepNames": [
+                "openvpn-msi"
+            ],
+            "groupName": "bundled OpenVPN",
+            "prBodyNotes": [
+                "**Before merging:** the MSI ships its own openvpn-gui. Check the pinned commit with `gh api \"repos/OpenVPN/openvpn-build/contents/src?ref=OpenVPN-{{newVersion}}\" --jq '.[]|select(.name==\"openvpn-gui\")|.sha'` and rebase this fork onto it if it moved past `ee41d6d` (v11.66.0.0). Then tag a new `custom.N` release."
+            ]
         }
     ],
     "customManagers": [
@@ -26,11 +35,28 @@
             "managerFilePatterns": [
                 "/^\\.github/workflows/.+\\.yml$/"
             ],
-            "matchStrings": ["vcpkgGitCommitId:\\s*(?<currentDigest>.*?)\\n"],
+            "matchStrings": [
+                "vcpkgGitCommitId:\\s*(?<currentDigest>.*?)\\n"
+            ],
             "currentValueTemplate": "master",
             "depNameTemplate": "vcpkg",
             "packageNameTemplate": "https://github.com/microsoft/vcpkg",
             "datasourceTemplate": "git-refs"
+        },
+        {
+            "customType": "regex",
+            "managerFilePatterns": [
+                "/^\\.github/workflows/release\\.yml$/",
+                "/^scripts/install\\.ps1$/"
+            ],
+            "matchStrings": [
+                "OpenVPN-(?<currentValue>\\d+\\.\\d+\\.\\d+-I\\d+)-amd64\\.msi"
+            ],
+            "depNameTemplate": "openvpn-msi",
+            "packageNameTemplate": "OpenVPN/openvpn-build",
+            "datasourceTemplate": "github-tags",
+            "extractVersionTemplate": "^OpenVPN-(?<version>\\d+\\.\\d+\\.\\d+-I\\d+)$",
+            "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-I(?<build>\\d+)$"
         }
     ]
 }
